@@ -89,23 +89,74 @@ void displayLeaderboard(const vector<Player>& leaderboard) {
     }
 }
 
+void clearLeaderboard(vector<Player>& leaderboard) {
+    leaderboard.clear(); // 清空内存中的容器
+    ofstream file("leaderboard.txt", ios::trunc); // trunc：清空文件内容
+    if (file.is_open()) {
+        file.close();
+    }
+    cout << "排行榜已清空！" << endl;
+}
+
+int getMenuChoice(){
+    int choice;
+    cout << "=== 请选择功能 ==="<<endl;
+    cout << "1. 开始游戏"<<endl;;
+    cout << "2. 查看排行榜"<<endl;
+    cout << "3. 清空排行榜"<<endl;
+    cout << "0. 退出"<<endl;
+    cout << "请输入你的选择: ";
+    while (!(cin >> choice)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "输入无效，请输入一个整数: ";
+    }
+    return choice;
+}
+
 int main(){
     cout<<"欢迎来到猜数字游戏"<<endl;
     srand(time(nullptr));//设置种子，保证随机
     vector<Player> leaderboard;//使用动态数组容器，是一个存储Player这个类的数组，名字叫leaderboard
     loadLeaderboard(leaderboard);
-    string playerName;
-    cout << "请输入你的名字: ";
-    cin >> playerName;
-    int targetNumber=generateRandomNumber(1,100);//设置随机数的范围，此处得到的范围是1-100
-    int guessCount = 0;//设置最开始的猜测次数是0
-    while(1){
-    int playerGuess=getPlayerGuess();
-        if (compareGuess(playerGuess,targetNumber,guessCount)){
-            updateLeaderboard(leaderboard, playerName, guessCount);
-            displayLeaderboard(leaderboard);
-           break;
-        } 
+    
+ while (1) {
+        int choice = getMenuChoice();
+
+        switch (choice) {
+            case 1: {   // 开始游戏
+                string playerName;
+                cout << "请输入你的名字: ";
+                cin >> playerName;
+
+                int targetNumber = generateRandomNumber(1,100);
+                int guessCount = 0;
+
+                while(1){
+                    int playerGuess = getPlayerGuess();
+                    if (compareGuess(playerGuess, targetNumber, guessCount)) {
+                        updateLeaderboard(leaderboard, playerName, guessCount);
+                        displayLeaderboard(leaderboard);
+                        break;
+                    }
+                }
+                break;
+            }
+
+            case 2:   // 查看排行榜
+                displayLeaderboard(leaderboard);
+                break;
+
+            case 3:   // 清空排行榜
+                clearLeaderboard(leaderboard);
+                break;
+
+            case 0:   // 退出程序
+                cout << "感谢游玩，再见！" << endl;
+                return 0;
+
+            default:  // 非法输入
+                cout << "无效选择，请重新输入！" << endl;
+        }
     }
-    return 0;
-    }
+}
